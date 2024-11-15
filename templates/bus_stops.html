@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{bus_number}}번 버스 정류장 목록</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <h3>8번 버스 정류장 목록</h3>
+    <ul>
+        {% for stop in bus_stops %}
+        <li>{{ stop[0] }} [{{ stop[1] }}]</li>
+        {% endfor %}
+    </ul>
+    <a href="{{ url_for('home') }}">메인 페이지로 돌아가기</a>
+</body>
+</html>

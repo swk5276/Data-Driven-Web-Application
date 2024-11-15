@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>INU BUS SCHEDULE</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <h1>인천대학교 자연과학대학 정류장</h1>
+        <h4 style="color: slategray;">[38375] 인천대정문 방면 버스 목록</h4>
+
+        <!-- 검색어 입력 필드 -->
+        <form action="/search" method="get">
+            <input type="text" name="query" placeholder="검색어를 입력하세요" value="{{ query | default('') }}">
+            <button type="submit">검색</button>
+            <p></p>
+        </form>
+
+        <!-- 동적으로 생성된 버스 목록 -->
+        <ul class="bus-list">
+            {% for bus in bus_list %}
+                <li class="bus-item">
+                    <a href="/bus/{{ bus.bus_number }}" class="bus-link">
+                        <div class="bus-number">{{ bus.bus_number }}</div>
+                        <div class="bus-name">{{ bus.direction }}</div>
+                    </a>
+                </li>
+            {% endfor %}
+        </ul>
+    </div>
+
+</body>
+</html>

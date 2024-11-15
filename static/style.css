@@ -1,0 +1,115 @@
+body {
+    font-family: Arial, sans-serif;
+    text-align: center;
+    background-color: darkgrey;
+    margin: 10;
+    padding: 10;
+}
+
+h1 {
+    color: darkblue;
+    margin-top: 40px;
+}
+
+h3 {
+    color: darkblue;
+    font-weight: normal;
+    font-weight: bold;
+    margin: 20px 0;
+}
+h4 {
+    background-color: white;
+    color: gray;
+    font-weight: bold;
+    margin: 20px 0;
+}
+h5 {
+    color: white;
+    font-weight: normal;
+    margin: 20px 0;
+}
+
+.container {
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 25px;
+    background-color: snow;
+    box-shadow: 0px 6px 12px rgba(0, 0, 0, 0.15);
+    border-radius: 5px;
+}
+
+.bus-list {
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+    background-color: transparent; /* 배경색 제거 */
+
+}
+
+.bus-item {
+    display: flex;
+    align-items: center;
+    background-color: skyblue;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    padding: 10px;
+    /* box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1); */
+    text-decoration: none; /* 링크 밑줄 제거 */
+    color: inherit; /* 링크의 색상이 텍스트 색상과 같게 유지 */
+}
+
+.bus-number {
+    /* background-color: darkblue; */
+    color: #ffffff;
+    font-size: 1.2em;
+    font-weight: bold;
+    width: 100px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 10%;
+    margin-right: 15px;
+}
+
+/* 각 항목에 다른 배경색 설정 */
+.bus-list .bus-item:nth-child(1) .bus-number {
+    background-color: darkblue;
+}
+.bus-list .bus-item:nth-child(2) .bus-number {
+    background-color: blue; /* 두 번째 항목 - 토마토색 */
+}
+
+.bus-list .bus-item:nth-child(3) .bus-number {
+    background-color: green; /* 세 번째 항목 - 라임색 */
+}
+
+.bus-list .bus-item:nth-child(4) .bus-number {
+    background-color: darkred; /* 네 번째 항목 - 금색 */
+}
+
+.bus-list .bus-item:nth-child(5) .bus-number {
+    background-color: darkblue; /* 다섯 번째 항목 - 핑크색 */
+}
+
+.bus-list .bus-item:nth-child(6) .bus-number {
+    background-color: darkblue; /* 여섯 번째 항목 - 보라색 */
+}
+
+/* .bus-link 스타일 */
+.bus-link {
+    text-decoration: none;
+    background-color: transparent; /* 배경색 제거 */
+
+    color: inherit;
+    display: flex;
+    align-items: center;
+}
+
+.bus-name {
+    color: white;
+    font-size: 1em;
+    text-align: left;
+    font-weight: bold;
+    flex: 1;
+}

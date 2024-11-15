@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>INU BUS SCHEDULE - Search Results</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <h1>검색 결과</h1>
+        <p>검색어와 일치하는 버스를 확인하세요:</p>
+        
+        <!-- 검색어 입력 필드 -->
+        <form action="/search" method="get">
+            <input type="text" name="query" placeholder="검색어를 입력하세요" value="{{ query | default('') }}">
+            <button type="submit">검색</button>
+        </form>
+
+        {% if search_results %}
+        <ul class="search-results">
+            {% for result in search_results %}
+            <li class="result-item">
+                <h3>버스 번호: {{ result[0] }}</h3>
+                <p>운행 경로: {{ result[5] }}</p>
+                <p>첫차: {{ result[1] }}, 막차: {{ result[2] }}</p>
+                <p>평일 배차 간격: {{ result[3] }}, 주말 배차 간격: {{ result[4] }}</p>                
+            </li>
+            {% endfor %}
+        </ul>
+        {% else %}
+        <div class="no-results">
+            <p>검색어와 일치하는 결과가 없습니다.</p>
+        </div>
+        {% endif %}
+
+        <a href="/" class="back-link">메인 페이지로 돌아가기</a>
+    </div>
+</body>
+</html>

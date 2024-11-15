@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ bus_info.bus_number }}번 버스 정보</title>
+</head>
+<body>
+    {% if bus_info %}
+        <div class="container">
+            <h1>{{ bus_info.bus_number }}번 버스 정보</h1>
+            <p>운행 경로: {{ bus_info.route }}</p>
+            <p>첫차: {{ bus_info.departure_first }}, 막차: {{ bus_info.departure_last }}</p>
+            <p>평일 배차 간격: {{ bus_info.interval_weekday }}, 주말 배차 간격: {{ bus_info.interval_weekend }}</p>
+        </div>
+    {% else %}
+        <div class="container">
+            <p>해당 버스 정보를 찾을 수 없습니다.</p>
+        </div>
+    {% endif %}
+    <a href="/" class="back-link">메인 페이지로 돌아가기</a>
+</body>
+</html>
