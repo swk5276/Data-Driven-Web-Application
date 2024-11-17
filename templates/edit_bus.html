@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>버스 정보 수정</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <h2>버스 정보 업데이트</h2>
+        <form action="/update-bus" method="post">
+            <input type="hidden" name="bus_id" value="{{ bus['bus_id'] }}">
+            
+            <label for="route">운행 경로:</label>
+            <input type="text" id="route" name="route" value="{{ bus['route'] }}" required style="flex: 1; min-width: 350px;">
+            <p></p>
+            <label for="interval_weekday">평일 배차 간격:</label>
+            <input type="text" id="interval_weekday" name="interval_weekday" value="{{ bus['interval_weekday'] }}" required style="flex: 1; min-width: 350px;">
+            <p></p>
+            <label for="interval_weekend">주말 배차 간격:</label>
+            <input type="text" id="interval_weekend" name="interval_weekend" value="{{ bus['interval_weekend'] }}" required style="flex: 1; min-width: 350px;">
+            <p></p>
+            <label for="departure_first">첫차 출발 시간:</label>
+            <input type="text" id="departure_first" name="departure_first" value="{{ bus['departure_first'] }}" required style="flex: 1; min-width: 350px;">
+            <p></p>
+            <label for="departure_last">막차 출발 시간:</label>
+            <input type="text" id="departure_last" name="departure_last" value="{{ bus['departure_last'] }}" required style="flex: 1; min-width: 350px;">
+            <p></p>
+            <button type="submit">수정 완료</button>
+        </form>
+    </div>
+</body>
+</html>

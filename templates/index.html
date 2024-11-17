@@ -1,35 +1,65 @@
 <!DOCTYPE html>
-<html lang="en">
 <head>
-    <meta charset="UTF-8">
+    <!-- 문서 유형 선언 -->
+    <meta charset="UTF-8"> 
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- 웹 페이지 제목 -->
     <title>INU BUS SCHEDULE</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
+
 <body>
+    <!-- contents를 감싸는 container -->
     <div class="container">
-        <h1>인천대학교 자연과학대학 정류장</h1>
-        <h4 style="color: slategray;">[38375] 인천대정문 방면 버스 목록</h4>
+        <!-- 메인 제목 -->
+        <h3>인천대학교 자연과학대학 정류장 버스 운행 정보</h3>
+        <!-- 부 제목 -->
+        <h5 style="color: slategray;">[38375] 인천대정문 방면 버스 목록</h5>
 
         <!-- 검색어 입력 필드 -->
+        <!-- 검색어를 get메서드로 서버에 전송 -->
         <form action="/search" method="get">
-            <input type="text" name="query" placeholder="검색어를 입력하세요" value="{{ query | default('') }}">
+            <!-- 서버에서 검색어를 유지할 수 있도록 value에 기존 값을 설정 -->
+            <input type="text" name="query" placeholder="원하는 검색어를 입력하세요" value="{{ query | default('') }}">
+            <!-- 검색 버튼 -->
             <button type="submit">검색</button>
             <p></p>
         </form>
 
         <!-- 동적으로 생성된 버스 목록 -->
         <ul class="bus-list">
+            <!-- 버스 리스트에 있는 버스 항목에 대해 반복 -->
             {% for bus in bus_list %}
-                <li class="bus-item">
-                    <a href="/bus/{{ bus.bus_number }}" class="bus-link">
-                        <div class="bus-number">{{ bus.bus_number }}</div>
-                        <div class="bus-name">{{ bus.direction }}</div>
-                    </a>
-                </li>
+            <!-- 개별 버스 항목  -->
+            <li class="bus-item">
+                <!-- 버스 번호와 방면을 클릭 하여 이동 -->
+                <a href="/bus/{{ bus.bus_number }}" class="bus-link">
+                    <div class="bus-number">{{ bus.bus_number }}</div>
+                    <div class="bus-name">{{ bus.direction }}</div>
+                </a>
+
+                <!-- 삭제 버튼 -->
+                <!-- 삭제 요청을 처리하는 flask라우트(/delete-bus)로 데이터를 전송 -->
+                <!-- HTTP post메서드를 통해 데이터를 서버에 전송 -->
+                <!-- post는 데이터를 삭제하거나 서버에 영향을 미치는 작업에 사용 -->
+                <form action="/delete-bus" method="post" style="text-align: right;" class="button-form">
+                    <!-- 삭제할 버스 번호를 서버로 숨겨진 필드를 통해 전달 -->
+                    <!-- 서버에서는 이 값을 이용하여 데이터베이스에서 해당 항목을 삭제 -->
+                    <input type="hidden" name="bus_number" value="{{ bus.bus_number }}">
+                    <button type="submit" class="delete-button">정보 삭제</button>
+                </form>
+
+                <!-- 수정 버튼 -->
+                <!-- HTTP get메서드를 통해 데이터를 서버에 전송하지 않고 URL로 요청 -->
+                <form action="/edit-bus/{{ bus.bus_number }}" method="get" class="button-form">
+                    <button type="submit" class="edit-button">정보 수정</button>
+                </form>
+
+            </li>
             {% endfor %}
         </ul>
     </div>
 
 </body>
+
 </html>
