@@ -1,0 +1,82 @@
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add New Bus</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            height: 100vh;
+            align-items: center;
+        }
+
+        .container{
+            width: 400px;
+            text-align: left;
+        }
+
+        input[type="text"] {
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            flex: 1;
+            max-width: 400px;
+            margin-right: 10px;
+            }
+        button {
+            background-color: #007BFF;
+            color: #fff;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        .bus_number {
+    </style>
+</head>
+
+<body>
+    <div class="container" style="text-align: center;">
+    <h2 style="color: #0056b3;">새로운 버스 목록</h2><br>
+    <form method="post" action="{{url_for('add_bus')}}" justify-content: center; >
+        
+        <label for="bus_number">버스 번호 :</label>
+        <input type="text" id="bus_number" name="bus_number" required>
+        <p></p>
+
+        <label for="route">운행 방면 :</label>
+        <input type="text" id="route" name="route" required>
+        <p></p>
+
+        <label for="interval_weekday">평일 배차 간격 :</label>
+        <input type="text" id="interval_weekday" name="interval_weekday" required size="15">
+        <p></p>
+
+        <label for="interval_weekend">주말 배차 간격 :</label>
+        <input type="text" id="interval_weekend" name="interval_weekend" required size="15">
+        <p></p>
+
+        <label for="departure_first">첫차 시간 :</label>
+        <input type="text" id="departure_first" name="departure_first" required>
+        <p></p>
+
+        <label for="departure_last">막차 시간 :</label>
+        <input type="text" id="departure_last" name="departure_last" required>
+        <p></p>
+
+        <button type="submit">버스 목록 추가</button>
+    </form>
+</div>
+</body>
+
+</html>

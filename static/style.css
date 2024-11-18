@@ -1,7 +1,7 @@
 body {
     font-family: Arial, sans-serif;
     text-align: center;
-    background-color: darkgrey;
+    background-color: cornflowerblue;
     display: flex; /* Flexbox 사용 */
     justify-content: center; /* 가로 중앙 정렬 */
     align-items: center; /* 세로 중앙 정렬 */
@@ -32,8 +32,8 @@ h5 {
     max-width: 800px;
     margin: 0 auto;
     padding: 25px;
-    background-color: snow;
-    box-shadow: 0px 6px 12px rgba(0, 0, 0, 0.15);
+    background-color: whitesmoke;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
     border-radius: 10px;
     text-align: center;
 
@@ -50,7 +50,7 @@ h5 {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    background-color: skyblue;
+    background-color: cornflowerblue;
     border-radius: 8px;
     margin-bottom: 20px;
     padding: 10px;
@@ -109,19 +109,20 @@ h5 {
     border-radius: 5px;
     cursor: pointer;
     font-size: 14px;
+    
 }
 
 .delete-button {
-    background-color: #ff6666;
+    background-color: darkred;
     color: white;
 }
 
 .delete-button:hover {
-    background-color: #cc0000;
+    background-color: darkred;
 }
 
 .edit-button {
-    background-color: #4CAF50;
+    background-color: olive;
     color: white;
 }
 
@@ -131,6 +132,6 @@ h5 {
     padding: auto;
 }
 
-.route{
-
+.button-container button:hover {
+    transform: scale(1.1);
 }

@@ -5,11 +5,115 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>INU BUS SCHEDULE - Search Results</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: cornflowerblue;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #ffffff;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+
+        h1 {
+            color: #333;
+            margin-bottom: 20px;
+        }
+
+        p {
+            color: #666;
+            margin-bottom: 20px;
+        }
+
+        form {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 30px;
+        }
+
+        input[type="text"] {
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            flex: 1;
+            max-width: 400px;
+            margin-right: 10px;
+        }
+
+        button {
+            background-color: #007BFF;
+            color: #fff;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        .search-results {
+            list-style-type: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .result-item {
+            background: #f1f1f1;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            padding: 15px;
+            margin-bottom: 15px;
+            text-align: left;
+        }
+
+        .result-item h3 {
+            color: #007BFF;
+            margin-bottom: 10px;
+        }
+
+        .result-item p {
+            color: #555;
+            margin: 5px 0;
+        }
+
+        .no-results {
+            background: #ffcdd2;
+            color: #d32f2f;
+            padding: 10px;
+            border-radius: 5px;
+            font-weight: bold;
+        }
+
+        .back-link {
+            display: inline-block;
+            margin-top: 20px;
+            text-decoration: none;
+            color: white;
+            font-weight: bold;
+            border-radius: 5px;
+            padding: 10px;
+            background-color: #007BFF;
+        }
+
+        .back-link:hover {
+            color: #0056b3;
+        }
+    </style>
 </head>
 <body>
     <div class="container">
         <h1>검색 결과</h1>
-        <p>검색어와 일치하는 버스를 확인하세요:</p>
+        <p>검색어와 관련된 단어를 확인하세요:</p>
         
         <!-- 검색어 입력 필드 -->
         <form action="/search" method="get">
@@ -20,14 +124,15 @@
         {% if search_results %}
         <ul class="search-results">
             {% for result in search_results %}
-            <li class="result-item">
-                <h3>버스 번호: {{ result[0] }}</h3>
-                <p>운행 경로: {{ result[5] }}</p>
-                <p>첫차: {{ result[1] }}, 막차: {{ result[2] }}</p>
-                <p>평일 배차 간격: {{ result[3] }}, 주말 배차 간격: {{ result[4] }}</p>                
-            </li>
+                <li class="result-item">
+                    <h3>버스 번호: {{ result[0] }}</h3>
+                    <p>운행 경로: {{ result[5] }}</p>
+                    <p>첫차: {{ result[1] }}, 막차: {{ result[2] }}</p>
+                    <p>평일 배차 간격: {{ result[3] }}, 주말 배차 간격: {{ result[4] }}</p>
+                </li>
             {% endfor %}
         </ul>
+        
         {% else %}
         <div class="no-results">
             <p>검색어와 일치하는 결과가 없습니다.</p>
