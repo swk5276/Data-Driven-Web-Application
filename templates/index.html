@@ -56,21 +56,20 @@
         <ul class="bus-list" style="list-style-type: none; padding: 0; margin: 0;">
             {% for bus in bus_list %}
             <!-- 개별 버스 항목 -->
-            <li class="bus-item" style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 15px; padding: 15px; border: 1px solid #ccc; border-radius: 10px; background-color: 
-            {% if loop.index == 1 %} darkblue
-            {% elif loop.index == 2 %} blue
-            {% elif loop.index == 3 %} green
-            {% elif loop.index == 4 %} darkred
-            {% elif loop.index == 5 %} skyblue
-            {% elif loop.index == 6 %} red
-            {% else %} lightgray
-            {% endif %}; color: white;">
+            <li class="bus-item {% if loop.index == 1 %} bus-color-1
+            {% elif loop.index == 2 %} bus-color-2
+            {% elif loop.index == 3 %} bus-color-3
+            {% elif loop.index == 4 %} bus-color-4
+            {% elif loop.index == 5 %} bus-color-5
+            {% elif loop.index == 6 %} bus-color-6
+            {% else %} bus-color-default
+            {% endif %}">
 
                 <!-- 버스 번호와 방면 -->
                 <a href="/bus/{{ bus.bus_number }}"
-                    style="display: flex; flex-direction: row; align-items: right; flex: 1; gap: 10px; text-decoration: none; color: white;">
+                    style="display: flex; flex-direction: row; align-items: center; flex: 1; gap: 10px; text-decoration: none; color: white;">
                     <div
-                        style="flex-shrink: 0; font-size: 18px; font-weight: bold; color: white; width: 50px; text-align: right;">
+                        style="flex-shrink: 0; font-size: 18px; font-weight: bold; color: white; width: 50px; text-align: center;">
                         {{ bus.bus_number }} <!-- 버스 번호 -->
                     </div>
                     <div style="flex: 1; font-size: 14px; font-weight: bold; color: white; text-align: left; margin-right: 30px;">
@@ -83,7 +82,7 @@
                     <form action="/edit-bus/{{ bus.bus_number }}" method="get" class="button-form" style="margin: 0;">
                         <button type="submit" class="edit-button"
                             style="background-color: dodgerblue; color: white; border: none; padding: 5px 10px; border-radius: 5px; cursor: pointer;">
-                            정보 수정
+                            수정
                         </button>
                     </form>
                     <form action="/delete-bus" method="post" class="button-form" style="margin: 0;">

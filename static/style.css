@@ -56,6 +56,14 @@ h5 {
     padding: 10px;
     color: inherit;
 }
+.bus-color-1 { background-color: darkblue; }
+.bus-color-2 { background-color: blue; }
+.bus-color-3 { background-color: green; }
+.bus-color-4 { background-color: darkred; }
+.bus-color-5 { background-color: skyblue; }
+.bus-color-6 { background-color: red; }
+.bus-color-default { background-color: lightgray; }
+
 
 .bus-number {
     color: #ffffff;
