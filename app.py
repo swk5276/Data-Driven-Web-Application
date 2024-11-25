@@ -2,7 +2,7 @@
 # `render_template`는 HTML 템플릿 렌더링
 # `request`는 클라이언트 요청 데이터를 처리
 # `redirect`와 `url_for`는 URL 리다이렉트에 사용
-from flask import Flask, render_template, request, redirect, url_for
+from flask import Flask, render_template, request, redirect, url_for, session
 
 # SQLite 데이터베이스와 상호작용하기 위한 모듈
 import sqlite3
@@ -11,11 +11,15 @@ import os
 # Flask 애플리케이션 객체를 생성
 app = Flask(__name__)
 
+app.secret_key = 'your_secret_key'  # 세션 암호화를 위한 키
+
+
 # 데이터베이스 파일 경로 설정
 # 주 데이터베이스 파일 경로를 `DATABASE`에 저장
-# 각 버스 번호에 따른 데이터베이스 파일이 저장된 폴더 경로를 `DATABASE_FOLDER`에 저장
+# 각 버스 번호에 따른 데이터베이스 파일이 저장된 폴더 경로를 `DATABASE2`에 저장
 DATABASE = os.path.join(app.root_path, 'instance', 'bus_data.db')
-DATABASE_FOLDER = os.path.join(app.root_path, 'databases')
+DATABASE2 = os.path.join(app.root_path, 'databases')
+
 
 # 데이터베이스에 특정 버스 번호에 따른 정류장 목록 가져오는 함수
 def get_bus_stops_by_bus_number(bus_number):
@@ -27,7 +31,10 @@ def get_bus_stops_by_bus_number(bus_number):
     # SQL 쿼리를 실행합니다.# SQL 쿼리를 실행하여 `Bus_Info`와 `Bus_Schedule` 테이블을 조인하고
     # 특정 버스 번호에 대한 정보를 검색합니다.
     # `bus_number`를 문자열로 변환하여 쿼리에 전달합니다.
+
+    #예외가 발생할 수 있는 코드 작성
     try:
+        #Bus_Info 테이블과 Bus_Schedule 테이블을 bus_id를 기준으로 조인
         cursor.execute("""
             SELECT b.bus_number, s.departure_first, s.departure_last, 
                    s.interval_weekday, s.interval_weekend, s.route 
@@ -52,12 +59,13 @@ def get_bus_stops_by_bus_number(bus_number):
     except sqlite3.Error as e:
         print(f"Database error: {e}")
         bus_info = None
+    #예외 발생과 상관없이 항상 실행
     finally:
-        # 데이터베이스 연결을 닫기
+        # 데이터베이스 연결 닫기
         conn.close()
-
-    return bus_info
     # 버스 정보를 반환합니다.
+    return bus_info
+
 
 # 버스 번호.db 파일에서 쿼리 실행 함수
 def query_db_from_file(db_path, query, args=(), one=False):
@@ -78,13 +86,46 @@ def query_db_from_file(db_path, query, args=(), one=False):
     # 하나의 결과만 필요한 경우 첫 번째 결과를 반환하고, 그렇지 않으면 전체 결과를 반환합니다.
     return (rv[0] if rv else None) if one else rv
 
+# 메인 페이지 데이터를 가져오는 함수
+def get_main_page_data(query=None):
+    conn = sqlite3.connect(DATABASE)
+    cursor = conn.cursor()
+    try:
+        # 모든 버스 정보를 가져오는 SQL쿼리 실행
+        cursor.execute("""
+            SELECT DISTINCT b.bus_number, s.route
+            FROM Bus_Info AS b
+            JOIN Bus_Schedule AS s ON b.bus_id = s.bus_id
+            ORDER BY b.bus_number ASC
+        """)
+        buses = cursor.fetchall() #쿼리 결과 가져오기
 
-@app.route('/bus/<bus_number>/details')
+        # 세션에서 즐겨찾기 목록 get
+        favorites = session.get('favorites', [])
+        # 버스 목록을 딕셔너리 형태로 변환
+        bus_list = [
+            {"bus_number": row[0], "direction": row[1], "is_favorite": row[0] in favorites}
+            for row in buses
+        ]
+        # 즐겨찾기된 항목을 상단에 표시하도록 정렬
+        bus_list.sort(key=lambda x: x['is_favorite'], reverse=True)  # 즐겨찾기 정렬
+    except sqlite3.Error as e:
+        print(f"Database error: {e}") #에러 발생 시 출력
+        bus_list = []
+    finally:
+        conn.close() # DB 닫기
+
+    # 검색어가 비어 있을 경우 query에 경고 메시지를 전달
+    query = "" if query is None else query
+    return bus_list, query
+
+
+
+#정류장 목록 렌더링
+@app.route('/bus/<bus_number>/details') #URL 라우팅
+#특정 버스 번호에 대한 상세 정보 반환
 def bus_details(bus_number):
-    """
-    특정 버스 번호의 정류장 목록을 가져와 렌더링합니다.
-    """
-    db_path = os.path.join(DATABASE_FOLDER, f"{bus_number}.db")
+    db_path = os.path.join(DATABASE2, f"{bus_number}.db")
     # 해당 버스 번호의 데이터베이스 파일 경로를 생성합니다.
 
     if not os.path.exists(db_path):
@@ -99,14 +140,13 @@ def bus_details(bus_number):
     return render_template('bus_details.html', bus_info=bus_info, stops=stops)
     # 정류장 목록과 버스 정보를 렌더링하여 반환합니다.
 
+
 #검색어에 따라 데이터베이스에서 버스목록 검색
 def search_buses(query=None):
     conn = sqlite3.connect(DATABASE)
     # 주 데이터베이스에 연결합니다.
     cursor = conn.cursor()
     # 쿼리를 실행하기 위한 커서를 생성합니다.
-
-    
     try:
         if query:
             # `query`를 기준으로 버스 번호나 경로를 검색합니다.
@@ -133,45 +173,34 @@ def search_buses(query=None):
         # 데이터베이스 오류가 발생하면 에러 메시지를 출력합니다.
         buses = []
         # 오류 발생 시 빈 리스트를 반환합니다.
-
     finally:
         conn.close()
         # 데이터베이스 연결을 닫습니다.
-
     return buses
     # 검색된 버스 목록을 반환합니다.
+
 
 #메인 페이지
 @app.route('/')
 def home():
-    conn = sqlite3.connect(DATABASE)
-    # 주 데이터베이스에 연결합니다.
-    cursor = conn.cursor()
-    # 데이터베이스 쿼리를 실행하기 위한 커서를 생성합니다.
+    bus_list, query = get_main_page_data()  # 메인 페이지 데이터를 가져옴
+    return render_template('index.html', bus_list=bus_list, query=query) #메인페이지 랜더링
 
-    try:
-        cursor.execute("""
-            SELECT DISTINCT b.bus_number, s.route
-            FROM Bus_Info AS b
-            JOIN Bus_Schedule AS s ON b.bus_id = s.bus_id
-            ORDER BY b.bus_number ASC
-        """)
-        # 버스 정보와 경로를 가져오는 SQL 쿼리를 실행합니다.
-        bus_list = [{"bus_number": row[0], "direction": row[1]} for row in cursor.fetchall()]
-        # 쿼리 결과를 딕셔너리 형태로 변환하여 버스 목록을 저장합니다.
 
-    except sqlite3.Error as e:
-        print(f"Database error: {e}")
-        # 데이터베이스 오류가 발생하면 메시지를 출력합니다.
-        bus_list = []
-        # 오류 발생 시 빈 목록을 반환합니다.
+# 즐겨찾기 상태 토글
+@app.route('/favorite-bus/<bus_number>', methods=['POST'])
+def favorite_bus(bus_number):
+    favorites = session.get('favorites', [])# 세션에서 즐겨찾기 목록 가져오기 (없으면 빈 리스트)
+    
+    if bus_number in favorites:
+        favorites.remove(bus_number)  # 이미 즐겨찾기된 경우 제거
+    else:
+        favorites.append(bus_number)  # 즐겨찾기 추가
 
-    finally:
-        conn.close()
-        # 데이터베이스 연결을 닫습니다.
+    # 세션에 업데이트된 즐겨찾기 목록 저장
+    session['favorites'] = favorites
+    return redirect(url_for('home'))
 
-    return render_template('index.html', bus_list=bus_list)
-    # 메인 페이지를 렌더링하면서 버스 목록을 전달합니다.
 
 #버스 정보 페이지
 @app.route('/bus/<bus_number>')
@@ -181,15 +210,31 @@ def bus_info(bus_number):
     return render_template('bus_info.html', bus_info=bus_info)
     # 버스 정보를 포함하여 페이지를 렌더링합니다.
 
+
 #검색 결과 페이지
-@app.route('/search', methods=['GET'])
+@app.route('/search', methods=['GET', 'POST'])
 def search():
-    query = request.args.get('query', '') 
-    # GET 요청에서 검색어를 가져옵니다. 검색어가 없으면 빈 문자열을 기본값으로 설정합니다.
+    if request.method == 'POST':  # POST 요청일 경우
+        query = request.form.get('query', '').strip()
+
+        if not query:  # 검색어가 비어 있을 경우
+        # 아무 동작도 하지 않고, 현재 페이지를 다시 렌더링
+            bus_list, _ = get_main_page_data()
+            return render_template('index.html', bus_list=bus_list, query="")
+
+        # 검색어가 있을 경우
+        search_results = search_buses(query)
+        return render_template('search.html', search_results=search_results, query=query)
+
+    # GET 요청일 경우 (검색 결과 페이지 처리)
+    query = request.args.get('query', '').strip()
+    if not query:  # 검색어가 비어 있는 경우 메인 페이지 데이터 반환
+        bus_list, query = get_main_page_data(query=None)
+        return render_template('index.html', bus_list=bus_list, query=query)
+
     search_results = search_buses(query)
-    # 검색어를 기반으로 버스 목록을 검색합니다.
     return render_template('search.html', search_results=search_results, query=query)
-    # 검색 결과와 검색어를 포함하여 검색 페이지를 렌더링합니다.
+
 
 #버스 삭제 함수
 @app.route('/delete-bus', methods=['POST'])
@@ -218,6 +263,7 @@ def delete_bus():
 
     return redirect(url_for('home'))
     # 삭제 후 메인 페이지로 리다이렉트합니다.
+
 
 #버스 정보 수정 페이지
 @app.route('/edit-bus/<bus_number>', methods=['GET'])
@@ -265,6 +311,7 @@ def bus_edit(bus_number):
 
     return render_template('bus_edit.html', bus=bus_data)
     # 수정 페이지를 렌더링하며 버스 정보를 전달합니다.
+
 
 #수정 데이터 데이터베이스에 적용
 @app.route('/update-bus', methods=['POST'])
@@ -365,7 +412,7 @@ def add_bus():
     return render_template('bus_add.html')
     # GET 요청 시 버스 추가 페이지를 렌더링합니다.
 
-
+#애플리케이션 실행
 if __name__ == '__main__':
     app.run(debug=True)
     # 디버그 모드로 Flask 애플리케이션을 실행합니다.

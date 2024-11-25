@@ -121,6 +121,9 @@ h5 {
 }
 
 .delete-button {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start ;
     background-color: darkred;
     color: white;
 }
@@ -142,4 +145,8 @@ h5 {
 
 .button-container button:hover {
     transform: scale(1.1);
+}
+
+form.button-form {
+    margin: 0; /* 불필요한 외부 여백 제거 */
 }
