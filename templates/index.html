@@ -8,6 +8,52 @@
     <title>INU BUS SCHEDULE</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
     <style>
+        h3 {
+            font-family: 'Arial Black', sans-serif;
+            /* 강렬한 제목 폰트 */
+            font-size: 1.2rem;
+            /* 제목 크기 */
+            font-weight: bold;
+            color: #00000ee1;
+            /* 차분한 색상 */
+            /* text-shadow: 1px 1px 1.2px rgb(55, 55, 214); */
+            /* 그림자 효과 */
+            letter-spacing: 2px;
+            /* 글자 간격 */
+        }
+
+        h5 {
+            font-family: 'Georgia', serif;
+            /* 고급스러운 느낌의 서체 */
+            font-size: 0.8rem;
+            /* 제목 크기 */
+            color: rgb(0, 9, 92);
+            /* 강조 색상 */
+            font-weight: bold;
+            /* 굵게 */
+            padding-bottom: 5px;
+            /* 밑줄과의 간격 */
+        }
+
+        .bus-item a {
+            font-family: 'Open Sans', sans-serif;
+            /* 읽기 쉬운 서체 */
+            font-size: 16px;
+            /* 적절한 크기 */
+            color: #fafafa;
+            /* 부드러운 색상 */
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
+            /* 그림자 */
+        }
+
+        .bus-item a:hover {
+            color: #e4c309;
+            /* 호버 시 강조 색상 */
+
+            text-decoration: underline;
+            /* 밑줄 추가 */
+        }
+
         input[type="text"] {
             padding: 10px;
             border: 1px solid #ccc;
@@ -46,6 +92,8 @@
 
         .favorite-button:hover {
             color: orange;
+            border-style: dashed;
+            border-color: #333;
         }
     </style>
 </head>
@@ -56,7 +104,7 @@
         <!-- 메인 제목 -->
         <h3>인천대학교 자연과학대학 정류장 버스 운행 정보</h3>
         <!-- 부 제목 -->
-        <h5 style="color: blueviolet; font-weight: bold;">[38375] 인천대정문 방면 버스 목록</h5>
+        
 
         {% if error_message %}
         <p style="color: red;">{{ error_message }}</p>
@@ -65,7 +113,7 @@
         <!-- 검색어 입력 필드 -->
         <form action="/search" method="post" style="text-align: center; margin-bottom: 20px;">
             <input type="text" name="query"
-                style="width: 450px; padding: 10px; border: 1px solid #ccc; border-radius: 5px;"
+                style="width: 450px; padding: 10px; border: 1px solid #ffffff; border-radius: 5px;"
                 placeholder="관련 검색어를 입력하세요" value="{{ query }}">
             <button type="submit"
                 style="padding: 10px 15px; background-color: #007BFF; color: white; border: none; border-radius: 5px; cursor: pointer;">
@@ -93,21 +141,24 @@
                         style="flex-shrink: 0; font-size: 18px; font-weight: bold; color: white; width: 50px; text-align: center;">
                         {{ bus.bus_number }} <!-- 버스 번호 -->
                     </div>
-                    <div style="flex: 1; font-size: 14px; font-weight: bold; color: white; text-align: left; margin-right: 30px;">
+                    <div
+                        style="flex: 1; font-size: 14px; font-weight: bold; color: white; text-align: center; margin-right: 30px;">
                         {{ bus.direction }} <!-- 버스 방면 정보 -->
                     </div>
                 </a>
 
                 <!-- 버튼 그룹 -->
-                <div style="display: flex; gap: 10px;">
+                <!-- 버튼 그룹 -->
+                <div style="display: flex; gap: 10px; align-items: center;">
                     <!-- 즐겨찾기 버튼 -->
-                    <form action="/favorite-bus/{{ bus.bus_number }}" method="post" style="margin: 0;" >
-                        <button type="submit" class="favorite-button" style=" color: white;">
+                    <form action="/favorite-bus/{{ bus.bus_number }}" method="post" style="margin: 0;">
+                        <button type="submit" class="favorite-button"
+                            style="color: white; font-size: 16px; background: none; border: none;">
                             {% if bus.is_favorite %}★{% else %}☆{% endif %}
                         </button>
                     </form>
                     <!-- 수정 버튼 -->
-                    <form action="/edit-bus/{{ bus.bus_number }}" method="get" class="button-form" style="margin: 5;">
+                    <form action="/edit-bus/{{ bus.bus_number }}" method="get" class="button-form" style="margin: 0;">
                         <button type="submit" class="edit-button"
                             style="background-color: dodgerblue; color: white; border: none; padding: 5px 10px; border-radius: 5px; cursor: pointer;">
                             수정
@@ -122,16 +173,18 @@
                         </button>
                     </form>
                 </div>
+
             </li>
-            {% endfor %} <!-- Jinja2 반복문 종료 -->
+            {% endfor %}
         </ul>
+        <h5 style="color: blueviolet; font-weight: bold;">[38375] 인천대정문 방면 버스 목록</h5>
 
         <!-- 추가 버튼 -->
         <div style="text-align: center; margin-top: 20px;"> <!-- 중앙 정렬 -->
             <a href="{{ url_for('add_bus') }}"> <!-- 버스 추가 페이지로 이동 -->
                 <button type="button"
                     style="padding: 10px 20px; background-color: #007BFF; color: white; border: none; border-radius: 5px; cursor: pointer;">
-                    버스 목록 추가 <!-- 추가 버튼 텍스트 -->
+                    운행 버스 추가 <!-- 추가 버튼 텍스트 -->
                 </button>
             </a>
         </div>

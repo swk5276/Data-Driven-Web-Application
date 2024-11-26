@@ -18,8 +18,8 @@
         }
         .container {
             width: 90%;
-            max-width: 800px;
-            background-color: #ffffff;
+            max-width: 700px;
+            background-color: #f7f4f4;
             padding: 30px 40px;
             border-radius: 10px;
             box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
@@ -74,7 +74,7 @@
             z-index: 1;
         }
         .timeline-content {
-            background-color: #f9f9f9;
+            background-color: #ffffff;
             padding: 10px 15px;
             border-radius: 8px;
             box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
@@ -124,7 +124,21 @@
             </li>
             {% endfor %}
         </ul>
-        <a href="/bus/{{ bus_info.bus_number }}" class="back-link">버스 정보로 돌아가기</a>
+        <div id="dynamic-container">
+            <a href="/bus/{{ bus_info.bus_number }}" style="padding: 10px 20px; text-decoration: none; background-color: #ee2121; color: white; border-radius: 5px;">
+                버스 정보로 돌아가기
+            </a>
+        </div>
+        
+        <style>
+            #dynamic-container {
+                text-align: center;
+                width: 300px;
+                margin: 0 auto;
+            }
+        </style>
+        
+                     
     </div>
 </body>
 </html>
