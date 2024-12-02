@@ -21,6 +21,25 @@ DATABASE = os.path.join(app.root_path, 'instance', 'bus_data.db')
 DATABASE2 = os.path.join(app.root_path, 'databases')
 
 
+#정류장 목록 렌더링
+@app.route('/bus/<bus_number>/details') #URL 라우팅
+#특정 버스 번호에 대한 상세 정보 반환
+def bus_details(bus_number):
+    db_path = os.path.join(DATABASE2, f"{bus_number}.db")
+    # 해당 버스 번호의 데이터베이스 파일 경로를 생성합니다.
+
+    if not os.path.exists(db_path):
+        # 데이터베이스 파일이 존재하지 않는 경우, 빈 데이터를 렌더링합니다.
+        return render_template('bus_details.html', bus_info=None, stops=[])
+
+    stops = query_db_from_file(db_path, "SELECT id, name, stop_id FROM bus_stops ORDER BY id")
+    # 정류장 데이터를 데이터베이스에서 가져옵니다.
+    bus_info = {"bus_number": bus_number, "route": "Route not specified"}
+    # 기본 버스 정보를 설정합니다.
+    
+    return render_template('bus_details.html', bus_info=bus_info, stops=stops)
+    # 정류장 목록과 버스 정보를 렌더링하여 반환합니다.
+
 # 데이터베이스에 특정 버스 번호에 따른 정류장 목록 가져오는 함수
 def get_bus_stops_by_bus_number(bus_number):
     # 주 데이터베이스(`bus_data.db`)와 연결
@@ -86,8 +105,15 @@ def query_db_from_file(db_path, query, args=(), one=False):
     # 하나의 결과만 필요한 경우 첫 번째 결과를 반환하고, 그렇지 않으면 전체 결과를 반환합니다.
     return (rv[0] if rv else None) if one else rv
 
+#메인 페이지
+@app.route('/')
+def home():
+    bus_list, query = get_main_page_data()  # 메인 페이지 데이터를 가져옴
+    return render_template('index.html', bus_list=bus_list, query=query) #메인페이지 랜더링
+
 # 메인 페이지 데이터를 가져오는 함수
 def get_main_page_data(query=None):
+    # 주 데이터베이스에 연결합니다.
     conn = sqlite3.connect(DATABASE)
     cursor = conn.cursor()
     try:
@@ -120,33 +146,13 @@ def get_main_page_data(query=None):
     return bus_list, query
 
 
-
-#정류장 목록 렌더링
-@app.route('/bus/<bus_number>/details') #URL 라우팅
-#특정 버스 번호에 대한 상세 정보 반환
-def bus_details(bus_number):
-    db_path = os.path.join(DATABASE2, f"{bus_number}.db")
-    # 해당 버스 번호의 데이터베이스 파일 경로를 생성합니다.
-
-    if not os.path.exists(db_path):
-        # 데이터베이스 파일이 존재하지 않는 경우, 빈 데이터를 렌더링합니다.
-        return render_template('bus_details.html', bus_info=None, stops=[])
-
-    stops = query_db_from_file(db_path, "SELECT id, name, stop_id FROM bus_stops ORDER BY id")
-    # 정류장 데이터를 데이터베이스에서 가져옵니다.
-    bus_info = {"bus_number": bus_number, "route": "Route not specified"}
-    # 기본 버스 정보를 설정합니다.
-    
-    return render_template('bus_details.html', bus_info=bus_info, stops=stops)
-    # 정류장 목록과 버스 정보를 렌더링하여 반환합니다.
-
-
 #검색어에 따라 데이터베이스에서 버스목록 검색
 def search_buses(query=None):
-    conn = sqlite3.connect(DATABASE)
     # 주 데이터베이스에 연결합니다.
-    cursor = conn.cursor()
+    conn = sqlite3.connect(DATABASE)
     # 쿼리를 실행하기 위한 커서를 생성합니다.
+    cursor = conn.cursor()
+    
     try:
         if query:
             # `query`를 기준으로 버스 번호나 경로를 검색합니다.
@@ -180,11 +186,7 @@ def search_buses(query=None):
     # 검색된 버스 목록을 반환합니다.
 
 
-#메인 페이지
-@app.route('/')
-def home():
-    bus_list, query = get_main_page_data()  # 메인 페이지 데이터를 가져옴
-    return render_template('index.html', bus_list=bus_list, query=query) #메인페이지 랜더링
+
 
 
 # 즐겨찾기 상태 토글
@@ -217,13 +219,15 @@ def search():
     if request.method == 'POST':  # POST 요청일 경우
         query = request.form.get('query', '').strip()
 
-        if not query:  # 검색어가 비어 있을 경우
-        # 아무 동작도 하지 않고, 현재 페이지를 다시 렌더링
+        # 검색어가 비어 있을 경우
+        if not query:  
+            # 아무 동작도 하지 않고, 현재 페이지를 다시 렌더링
             bus_list, _ = get_main_page_data()
             return render_template('index.html', bus_list=bus_list, query="")
 
         # 검색어가 있을 경우
         search_results = search_buses(query)
+        #검색 페이지 랜더링
         return render_template('search.html', search_results=search_results, query=query)
 
     # GET 요청일 경우 (검색 결과 페이지 처리)
@@ -231,7 +235,7 @@ def search():
     if not query:  # 검색어가 비어 있는 경우 메인 페이지 데이터 반환
         bus_list, query = get_main_page_data(query=None)
         return render_template('index.html', bus_list=bus_list, query=query)
-
+    
     search_results = search_buses(query)
     return render_template('search.html', search_results=search_results, query=query)
 
