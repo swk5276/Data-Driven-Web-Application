@@ -1,2 +1,10 @@
+<<<<<<< HEAD
 pip install -r requirements.txt
 run : python app.py
+=======
+Flask==2.3.3  # Flask 웹 프레임워크
+Flask-Babel==3.1.0  # 다국어 지원 (gettext 사용)
+requests==2.31.0  # HTTP 요청 처리
+sqlite3==0.0.1  # SQLite 데이터베이스와 상호작용 (일부 환경에서는 기본 제공)
+
+>>>>>>> e84b1b8 (2024_12_16_final)
