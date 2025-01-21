@@ -6,7 +6,8 @@
 본 프로젝트는 **Flask Web Framework**와 **SQLite**를 활용하여 **인천대학교 자연과학대학 정류장 운행 정보**를 제공하는 웹 애플리케이션입니다.  
 사용자 중심의 UI/UX 설계를 통해 **실시간 버스 도착 정보**, **CRUD 기능**, **검색 및 즐겨찾기 관리** 등 다양한 기능을 제공합니다.  
 웹 프레임워크와 데이터베이스를 유기적으로 연결하여 **효율적이고 직관적인 사용자 경험**을 제공합니다.
-<br> https://github.com/user-attachments/assets/aacf719d-1201-44df-82a8-edb2306179d4
+
+https://github.com/user-attachments/assets/ce32e214-8142-4d80-bf72-a43eb75a9e58
 
 ---
 
