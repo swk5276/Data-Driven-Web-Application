@@ -21,8 +21,7 @@ DATABASE = os.path.join(app.root_path, 'instance', 'bus_data.db')
 DATABASE2 = os.path.join(app.root_path, 'databases')
 
 
-<<<<<<< HEAD
-=======
+
 # station_id 입력값 검증 함수
 def is_valid_station_id(station_id):
     # station_id는 숫자만 포함되어야 합니다.
@@ -35,7 +34,6 @@ def station_bus_info(station_id):  # 함수 이름 변경 (고유한 이름으�
         abort(400, gettext("잘못된 정류장 ID입니다."))
 
 
->>>>>>> e84b1b8 (2024_12_16_final)
 #정류장 목록 렌더링
 @app.route('/bus/<bus_number>/details') #URL 라우팅
 #특정 버스 번호에 대한 상세 정보 반환
