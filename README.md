@@ -1,7 +1,7 @@
 ---
 
 # **Incheon University Bus Information Management System**
-https://swk5276-a9dzecfaa5bagzca.eastasia-01.azurewebsites.net
+CI&CD 배포 주소 : https://swk5276-a9dzecfaa5bagzca.eastasia-01.azurewebsites.net
 ## **📌 프로젝트 개요**
 본 프로젝트는 **Flask Web Framework**와 **SQLite**를 활용하여 **인천대학교 자연과학대학 정류장 운행 정보**를 제공하는 웹 애플리케이션입니다.  
 사용자 중심의 UI/UX 설계를 통해 **실시간 버스 도착 정보**, **CRUD 기능**, **검색 및 즐겨찾기 관리** 등 다양한 기능을 제공합니다.  
