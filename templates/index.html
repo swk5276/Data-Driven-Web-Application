@@ -90,100 +90,187 @@
             border-style: dashed;
             border-color: #333;
         }
+
+        .openapi-data {
+            background-color: #f0f8ff;
+            padding: 15px;
+            border: 1px solid #007BFF;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+
+        .openapi-data h4 {
+            font-family: 'Arial', sans-serif;
+            font-size: 1rem;
+            color: #333;
+        }
+
+        .openapi-data ul {
+            list-style-type: none;
+            padding: 0;
+        }
+
+        .openapi-data li {
+            margin-bottom: 10px;
+        }
+        .openapi-container ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .openapi-container li {
+            margin-bottom: 15px;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            background-color: #fefefe;
+            box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .openapi-container li:hover {
+            background-color: #f0f8ff; /* Hover 시 더 밝은 색상 */
+            transform: scale(1.01); /* 살짝 확대 효과 */
+            transition: all 0.2s ease-in-out;
+        }
+
+        
     </style>
 </head>
 
 <body>
-    <!-- contents를 감싸는 container -->
-    <div class="container">
-        <!-- 메인 제목 -->
-        <h3>인천대학교 자연과학대학 정류장 버스 운행 정보</h3>
-        <!-- 부 제목 -->
+    <div class="container" style="display: flex; flex-direction: row;width: 70%; max-width: 1400px; gap: 20px; flex-wrap: nowrap; overflow: auto;">
+        
+        <!-- Left section: OpenAPI data -->
+        <div class="openapi-container" id="openapi-container" style="flex: 0 0 30%; max-width: 40%; background-color: #f9f9f9; padding: 15px; border-radius: 10px; box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);">
+
+            {% if openapi_data %}
+            <h4 style="font-family: 'Arial Black', sans-serif; font-size: 1rem; font-weight: bold; color: #000000; text-align: center; margin-bottom: 15px;">
+                실시간 버스 도착 정보
+            </h4>
+            <ul style="list-style: none; padding: 0; margin: 0;">
+                {% for bus in openapi_data %}
+                <li style="margin-bottom: 15px; padding: 10px; border: 1px solid #ddd; border-radius: 8px; background-color: #fff; box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);">
+                    <div style="font-family: 'Open Sans', sans-serif; font-size: 14px; color: #333; line-height: 1.6;">
+                        <strong style="color: #007BFF;">버스 번호:</strong> {{ bus['버스 번호'] }}<br>
+                        <strong style="color: #007BFF;">남은 정류장 수:</strong> {{ bus['남은 정류장 수'] }}<br>
+                        <strong style="color: #007BFF;">도착 예상 시간(초):</strong> {{ bus['도착 예상 시간(초)'] }}<br>
+                        <strong style="color: #007BFF;">최근 정류소 명:</strong> {{ bus['최근 정류소 명'] }}
+                    </div>
+                </li>
+                {% endfor %}
+            </ul>
+            {% else %}
+            <p style="font-family: 'Open Sans', sans-serif; font-size: 14px; color: #666; text-align: center;">
+                실시간 데이터가 없습니다.
+            </p>
+            {% endif %}
+        </div>
+
+        <!-- contents를 감싸는 container -->
+        <div class="container"style="flex: 1; max-width: 60%; padding: 15px;">
+            <!-- 메인 제목 -->
+            <h3>인천대학교 자연과학대학 정류장 버스 운행 정보</h3>
+
+            <!-- 검색어 입력 필드 -->
+            <form action="/search" method="post" style="text-align: center; margin-bottom: 20px;">
+                <input type="text" name="query"
+                    style="width: 450px; padding: 10px; border: 1px solid #ffffff; border-radius: 5px;"
+                    placeholder="관련 검색어를 입력하세요" value="{{ query }}">
+                <button type="submit"
+                    style="padding: 10px 15px; background-color: #007BFF; color: white; border: none; border-radius: 5px; cursor: pointer;">
+                    검색
+                </button>
+            </form>
         
 
-        <!-- {% if error_message %}
-        <p style="color: red;">{{ error_message }}</p> -->
-        {% endif %}
+            <!-- 동적으로 생성된 버스 목록 -->
+            <ul class="bus-list" style="list-style-type: none; padding: 0; margin: 0;">
+                {% for bus in bus_list %}
+                <!-- 개별 버스 항목 -->
+                <li class="bus-item {% if bus.is_favorite %} favorite-bus {% elif loop.index == 1 %} bus-color-1
+                {% elif loop.index == 2 %} bus-color-2
+                {% elif loop.index == 3 %} bus-color-3
+                {% elif loop.index == 4 %} bus-color-4
+                {% elif loop.index == 5 %} bus-color-5
+                {% elif loop.index == 6 %} bus-color-6
+                {% else %} bus-color-default
+                {% endif %}">
 
-        <!-- 검색어 입력 필드 -->
-        <form action="/search" method="post" style="text-align: center; margin-bottom: 20px;">
-            <input type="text" name="query"
-                style="width: 450px; padding: 10px; border: 1px solid #ffffff; border-radius: 5px;"
-                placeholder="관련 검색어를 입력하세요" value="{{ query }}">
-            <button type="submit"
-                style="padding: 10px 15px; background-color: #007BFF; color: white; border: none; border-radius: 5px; cursor: pointer;">
-                검색
-            </button>
-        </form>
+                    <!-- 버스 번호와 방면 -->
+                    <a href="/bus/{{ bus.bus_number }}"
+                        style="display: flex; flex-direction: row; align-items: center; flex: 1; gap: 10px; text-decoration: none; color: white;">
+                        <div
+                            style="flex-shrink: 0; font-size: 18px; font-weight: bold; color: white; width: 50px; text-align: center;">
+                            {{ bus.bus_number }} <!-- 버스 번호 -->
+                        </div>
+                        <div
+                            style="flex: 1; font-size: 14px; font-weight: bold; color: white; text-align: center; margin-right: 30px;">
+                            {{ bus.direction }} <!-- 버스 방면 정보 -->
+                        </div>
+                    </a>
 
-        <!-- 동적으로 생성된 버스 목록 -->
-        <ul class="bus-list" style="list-style-type: none; padding: 0; margin: 0;">
-            {% for bus in bus_list %}
-            <!-- 개별 버스 항목 -->
-            <li class="bus-item {% if bus.is_favorite %} favorite-bus {% elif loop.index == 1 %} bus-color-1
-            {% elif loop.index == 2 %} bus-color-2
-            {% elif loop.index == 3 %} bus-color-3
-            {% elif loop.index == 4 %} bus-color-4
-            {% elif loop.index == 5 %} bus-color-5
-            {% elif loop.index == 6 %} bus-color-6
-            {% else %} bus-color-default
-            {% endif %}">
-
-                <!-- 버스 번호와 방면 -->
-                <a href="/bus/{{ bus.bus_number }}"
-                    style="display: flex; flex-direction: row; align-items: center; flex: 1; gap: 10px; text-decoration: none; color: white;">
-                    <div
-                        style="flex-shrink: 0; font-size: 18px; font-weight: bold; color: white; width: 50px; text-align: center;">
-                        {{ bus.bus_number }} <!-- 버스 번호 -->
+                    <!-- 버튼 그룹 -->
+                    <div style="display: flex; gap: 10px; align-items: center;">
+                        <!-- 즐겨찾기 버튼 -->
+                        <form action="/favorite-bus/{{ bus.bus_number }}" method="post" style="margin: 0;">
+                            <button type="submit" class="favorite-button"
+                                style="color: white; font-size: 16px; background: none; border: none;">
+                                {% if bus.is_favorite %}★{% else %}☆{% endif %}
+                            </button>
+                        </form>
+                        <!-- 수정 버튼 -->
+                        <form action="/edit-bus/{{ bus.bus_number }}" method="get" class="button-form" style="margin: 0;">
+                            <button type="submit" class="edit-button"
+                                style="background-color: dodgerblue; color: white; border: none; padding: 5px 10px; border-radius: 5px; cursor: pointer;">
+                                수정
+                            </button>
+                        </form>
+                        <!-- 삭제 버튼 -->
+                        <form action="/delete-bus" method="post" class="button-form" style="margin: 0;">
+                            <input type="hidden" name="bus_number" value="{{ bus.bus_number }}">
+                            <button type="submit" class="delete-button"
+                                style="background-color: #d90000ed; color: white; border: none; padding: 5px 10px; border-radius: 5px; cursor: pointer;">
+                                삭제
+                            </button>
+                        </form>
                     </div>
-                    <div
-                        style="flex: 1; font-size: 14px; font-weight: bold; color: white; text-align: center; margin-right: 30px;">
-                        {{ bus.direction }} <!-- 버스 방면 정보 -->
-                    </div>
+
+                </li>
+                {% endfor %}
+            </ul>
+            <h5 style="color: blueviolet; font-weight: bold;">[38375] 인천대정문 방면 버스 목록</h5>
+
+            <!-- 추가 버튼 -->
+            <div style="text-align: center; margin-top: 20px;"> <!-- 중앙 정렬 -->
+                <a href="{{ url_for('add_bus') }}"> <!-- 버스 추가 페이지로 이동 -->
+                    <button type="button"
+                        style="padding: 10px 20px; background-color: #007BFF; color: white; border: none; border-radius: 5px; cursor: pointer;">
+                        운행 버스 추가 <!-- 추가 버튼 텍스트 -->
+                    </button>
                 </a>
-
-                <!-- 버튼 그룹 -->
-                <!-- 버튼 그룹 -->
-                <div style="display: flex; gap: 10px; align-items: center;">
-                    <!-- 즐겨찾기 버튼 -->
-                    <form action="/favorite-bus/{{ bus.bus_number }}" method="post" style="margin: 0;">
-                        <button type="submit" class="favorite-button"
-                            style="color: white; font-size: 16px; background: none; border: none;">
-                            {% if bus.is_favorite %}★{% else %}☆{% endif %}
-                        </button>
-                    </form>
-                    <!-- 수정 버튼 -->
-                    <form action="/edit-bus/{{ bus.bus_number }}" method="get" class="button-form" style="margin: 0;">
-                        <button type="submit" class="edit-button"
-                            style="background-color: dodgerblue; color: white; border: none; padding: 5px 10px; border-radius: 5px; cursor: pointer;">
-                            수정
-                        </button>
-                    </form>
-                    <!-- 삭제 버튼 -->
-                    <form action="/delete-bus" method="post" class="button-form" style="margin: 0;">
-                        <input type="hidden" name="bus_number" value="{{ bus.bus_number }}">
-                        <button type="submit" class="delete-button"
-                            style="background-color: #d90000ed; color: white; border: none; padding: 5px 10px; border-radius: 5px; cursor: pointer;">
-                            삭제
-                        </button>
-                    </form>
-                </div>
-
-            </li>
-            {% endfor %}
-        </ul>
-        <h5 style="color: blueviolet; font-weight: bold;">[38375] 인천대정문 방면 버스 목록</h5>
-
-        <!-- 추가 버튼 -->
-        <div style="text-align: center; margin-top: 20px;"> <!-- 중앙 정렬 -->
-            <a href="{{ url_for('add_bus') }}"> <!-- 버스 추가 페이지로 이동 -->
-                <button type="button"
-                    style="padding: 10px 20px; background-color: #007BFF; color: white; border: none; border-radius: 5px; cursor: pointer;">
-                    운행 버스 추가 <!-- 추가 버튼 텍스트 -->
-                </button>
-            </a>
+            </div>
         </div>
     </div>
 </body>
+<script>
+    function fetchOpenAPIData() {
+        fetch('/')  // '/' 엔드포인트에서 데이터를 가져옴
+            .then(response => response.text())
+            .then(data => {
+                // 서버에서 전체 HTML을 파싱
+                const parser = new DOMParser();
+                const htmlDocument = parser.parseFromString(data, "text/html");
+
+                // 새 OpenAPI 데이터를 가져와서 기존 데이터를 교체
+                const newOpenAPIContainer = htmlDocument.getElementById("openapi-container").innerHTML;
+                document.getElementById("openapi-container").innerHTML = newOpenAPIContainer;
+            })
+            .catch(error => console.error('Error fetching OpenAPI data:', error));
+    }
+
+    // 1초마다 fetchOpenAPIData 실행
+    setInterval(fetchOpenAPIData, 1000);
+</script>
 
 </html>
