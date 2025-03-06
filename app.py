@@ -1,8 +1,9 @@
-from flask import Flask, render_template, request, redirect, url_for, session
+from flask import Flask, render_template, request, redirect, url_for, session, jsonify, Response
 import requests
 import xml.etree.ElementTree as ET
 import sqlite3
 import os
+import re
 
 # Flask 애플리케이션 생성성
 app = Flask(__name__)
@@ -10,8 +11,8 @@ app = Flask(__name__)
 
 # OpenAPI URL 및 인증키
 API_URL = "http://apis.data.go.kr/6280000/busArrivalService/getAllRouteBusArrivalList"
-SERVICE_KEY = "21LUYCcFT/MUSLjgz+3847Jkw8ftf2mNdcz5LAHDgcjR8jki7+W0ONdLjUS9jL64CI8Kv0nnQuv1WbHUGmA9tA=="
-app.secret_key = 'your_secret_key'  # 세션 암호화를 위한 키
+SERVICE_KEY = "5iy4LiV6jEpweb6AjTXvrHCd9m6xZVr+gVMTXC4pYX/99Kf5+B4h19fgPAd3kd68BwgWWBJlCFNPOfPKQIyOdg=="#디코딩키
+app.secret_key = os.getenv("FLASK_SECRET_KEY", "default_fallback_key")  # 환경 변수 사용
 
 # 데이터베이스 파일 경로 설정 / 주 데이터베이스 파일 경로를 `DATABASE`에 저장 / 각 버스 번호에 따른 데이터베이스 파일이 저장된 폴더 경로를 `DATABASE2`에 저장
 DATABASE = os.path.join(app.root_path, 'instance', 'bus_data.db')
@@ -33,33 +34,56 @@ def fetch_openapi_data(station_id):
         response = requests.get(API_URL, params=params)
         if response.status_code == 200:
             root = ET.fromstring(response.content.decode('utf-8'))
-            result_code = root.find(".//resultCode").text
+            
+            result_code_element = root.find(".//msgHeader/resultCode")
+            if result_code_element is not None:
+                result_code = result_code_element.text
+            else:
+                print("Error: resultCode not found in API response")
+                return []  # 오류 발생 시 빈 리스트 반환
+            
             if result_code == "0":  # 정상 처리된 경우
                 buses = []
                 for item in root.findall(".//itemList"):
                     bus_info = {
-                        "버스 번호": item.find("BUS_NUM_PLATE").text,
-                        "남은 정류장 수": item.find("REST_STOP_COUNT").text,
-                        "도착 예상 시간(초)": item.find("ARRIVALESTIMATETIME").text,
-                        "최근 정류소 명": item.find("LATEST_STOP_NAME").text
+                        "버스 번호": item.find("BUS_NUM_PLATE").text if item.find("BUS_NUM_PLATE") is not None else "정보 없음",
+                        "남은 정류장 수": item.find("REST_STOP_COUNT").text if item.find("REST_STOP_COUNT") is not None else "정보 없음",
+                        "도착 예상 시간(초)": item.find("ARRIVALESTIMATETIME").text if item.find("ARRIVALESTIMATETIME") is not None else "정보 없음",
+                        "최근 정류소 명": item.find("LATEST_STOP_NAME").text if item.find("LATEST_STOP_NAME") is not None else "정보 없음"
                     }
+
                     buses.append(bus_info)
                 return buses
             else:
-                print(f"OpenAPI Error: {root.find('.//resultMsg').text}")
+                error_msg = root.findtext(".//resultMsg", default="Unknown error")
+                print(f"OpenAPI Error: {error_msg}")
         else:
             print(f"HTTP Error: {response.status_code}")
+
+    except ET.ParseError as e:
+        print(f"XML Parsing Error: {e}, Response: {response.text}")
     except Exception as e:
         print(f"OpenAPI Fetch Error: {e}")
     return []  # 실패 시 빈 리스트 반환
+
+def convert_to_xml(data):
+    root = ET.Element("BusInfoList")
+
+    for item in data:
+        bus_element = ET.SubElement(root, "Bus")
+        for key, value in item.items():
+            sub_element = ET.SubElement(bus_element, key)
+            sub_element.text = str(value)
+
+    return '<?xml version="1.0" encoding="UTF-8"?>' + ET.tostring(root, encoding="utf-8").decode()
+
 
 ######메인 페이지######
 @app.route('/', methods=['GET', 'POST'])
 def home():
         station_id = '165000364'  # 기본 정류소 ID
         bus_list, query = get_main_page_data()  # 기존 데이터베이스에서 버스 목록 가져오기
-        openapi_data = fetch_openapi_data(station_id)  # OpenAPI 데이터를 가져오기
-        return render_template('index.html', bus_list=bus_list, query=query, station_id=station_id, openapi_data=openapi_data)
+        return render_template('index.html', bus_list=bus_list, query=query, station_id=station_id)
  
 
 # 기존 데이터베이스 데이터를 가져오는 함수
@@ -133,7 +157,7 @@ def search_buses(query=None):
 def station_bus_info(station_id):  # 함수 이름 변경 (고유한 이름으로 수정)
     # 입력값 검증
     if not is_valid_station_id(station_id):
-        abort(400, gettext("잘못된 정류장 ID입니다."))
+        abort(400, "잘못된 정류장 ID입니다.")
 
 
 ######정류장 목록 랜더링링######
@@ -447,7 +471,32 @@ def add_bus():
     return render_template('bus_add.html')
     # GET 요청 시 버스 추가 페이지를 렌더링합니다.
 
+@app.route('/api/station/<station_id>/bus_info', methods=['GET'])
+def api_station_bus_info(station_id):
+    if not is_valid_station_id(station_id):
+        return jsonify({"status": "error", "message": "잘못된 정류장 ID입니다."}), 400
+    
+    openapi_data = fetch_openapi_data(station_id)
+
+    if not openapi_data:
+        return jsonify({"status": "error", "message": "버스 데이터를 가져올 수 없습니다."}), 500
+    
+    return jsonify({"status": "success", "data": openapi_data})
+
+
+@app.route('/api/buses', methods=['GET'])
+def get_buses():
+    bus_list, _ = get_main_page_data()
+
+    accept_type = request.accept_mimetypes.best_match(['application/json', 'application/xml'])
+
+    if accept_type == 'application/xml':
+        xml_data = convert_to_xml(bus_list)
+        return Response(xml_data, content_type="application/xml; charset=utf-8")
+
+    return jsonify({"status": "success", "data": bus_list})
+
 #애플리케이션 실행
 if __name__ == '__main__':
-    app.run(port =5001,debug=True)
+    app.run(debug=True)
     # 디버그 모드로 Flask 애플리케이션을 실행합니다.

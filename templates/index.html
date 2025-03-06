@@ -8,6 +8,14 @@
     <title>INU BUS SCHEDULE</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
     <style>
+        #openapi-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 15px;
+            padding: 10px;
+        }
+
         h3 {
             font-family: 'Arial Black', sans-serif;
             font-size: 1.2rem;
@@ -16,6 +24,36 @@
             letter-spacing: 2px;
             /* 글자 간격 */
         }
+
+        .bus-card {
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            padding: 15px;
+            width: 300px;
+            text-align: center;
+            transition: transform 0.3s ease;
+        }
+
+        .bus-card:hover {
+            transform: scale(1.05);
+        }
+
+        .bus-number {
+            font-size: 20px;
+            font-weight: bold;
+            color: #007bff;
+        }
+
+        .bus-info {
+            font-size: 14px;
+            color: #555;
+        }
+
+        .icon {
+            margin-right: 5px;
+        }
+
 
         h5 {
             font-family: 'Georgia', serif;
@@ -113,6 +151,7 @@
         .openapi-data li {
             margin-bottom: 10px;
         }
+
         .openapi-container ul {
             list-style: none;
             padding: 0;
@@ -129,28 +168,32 @@
         }
 
         .openapi-container li:hover {
-            background-color: #f0f8ff; /* Hover 시 더 밝은 색상 */
-            transform: scale(1.01); /* 살짝 확대 효과 */
+            background-color: #f0f8ff;
+            /* Hover 시 더 밝은 색상 */
+            transform: scale(1.01);
+            /* 살짝 확대 효과 */
             transition: all 0.2s ease-in-out;
         }
-
-        
     </style>
 </head>
 
 <body>
-    <div class="container" style="display: flex; flex-direction: row;width: 70%; max-width: 1400px; gap: 20px; flex-wrap: nowrap; overflow: auto;">
-        
+    <div class="container"
+        style="display: flex; flex-direction: row;width: 70%; max-width: 1400px; gap: 20px; flex-wrap: nowrap; overflow: auto;">
+
         <!-- Left section: OpenAPI data -->
-        <div class="openapi-container" id="openapi-container" style="flex: 0 0 30%; max-width: 40%; background-color: #f9f9f9; padding: 15px; border-radius: 10px; box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);">
+        <div class="openapi-container" id="openapi-container"
+            style="flex: 0 0 30%; max-width: 40%; background-color: #f9f9f9; padding: 15px; border-radius: 10px; box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);">
 
             {% if openapi_data %}
-            <h4 style="font-family: 'Arial Black', sans-serif; font-size: 1rem; font-weight: bold; color: #000000; text-align: center; margin-bottom: 15px;">
+            <h4
+                style="font-family: 'Arial Black', sans-serif; font-size: 1rem; font-weight: bold; color: #000000; text-align: center; margin-bottom: 15px;">
                 실시간 버스 도착 정보
             </h4>
             <ul style="list-style: none; padding: 0; margin: 0;">
                 {% for bus in openapi_data %}
-                <li style="margin-bottom: 15px; padding: 10px; border: 1px solid #ddd; border-radius: 8px; background-color: #fff; box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);">
+                <li
+                    style="margin-bottom: 15px; padding: 10px; border: 1px solid #ddd; border-radius: 8px; background-color: #fff; box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);">
                     <div style="font-family: 'Open Sans', sans-serif; font-size: 14px; color: #333; line-height: 1.6;">
                         <strong style="color: #007BFF;">버스 번호:</strong> {{ bus['버스 번호'] }}<br>
                         <strong style="color: #007BFF;">남은 정류장 수:</strong> {{ bus['남은 정류장 수'] }}<br>
@@ -168,7 +211,7 @@
         </div>
 
         <!-- contents를 감싸는 container -->
-        <div class="container"style="flex: 1; max-width: 60%; padding: 15px;">
+        <div class="container" style="flex: 1; max-width: 60%; padding: 15px;">
             <!-- 메인 제목 -->
             <h3>인천대학교 자연과학대학 정류장 버스 운행 정보</h3>
 
@@ -182,7 +225,7 @@
                     검색
                 </button>
             </form>
-        
+
 
             <!-- 동적으로 생성된 버스 목록 -->
             <ul class="bus-list" style="list-style-type: none; padding: 0; margin: 0;">
@@ -220,7 +263,8 @@
                             </button>
                         </form>
                         <!-- 수정 버튼 -->
-                        <form action="/edit-bus/{{ bus.bus_number }}" method="get" class="button-form" style="margin: 0;">
+                        <form action="/edit-bus/{{ bus.bus_number }}" method="get" class="button-form"
+                            style="margin: 0;">
                             <button type="submit" class="edit-button"
                                 style="background-color: dodgerblue; color: white; border: none; padding: 5px 10px; border-radius: 5px; cursor: pointer;">
                                 수정
@@ -255,22 +299,38 @@
 </body>
 <script>
     function fetchOpenAPIData() {
-        fetch('/')  // '/' 엔드포인트에서 데이터를 가져옴
-            .then(response => response.text())
+        fetch('/api/station/165000364/bus_info')
+            .then(response => response.json())
             .then(data => {
-                // 서버에서 전체 HTML을 파싱
-                const parser = new DOMParser();
-                const htmlDocument = parser.parseFromString(data, "text/html");
+                const openapiContainer = document.getElementById("openapi-container");
+                openapiContainer.innerHTML = "";
 
-                // 새 OpenAPI 데이터를 가져와서 기존 데이터를 교체
-                const newOpenAPIContainer = htmlDocument.getElementById("openapi-container").innerHTML;
-                document.getElementById("openapi-container").innerHTML = newOpenAPIContainer;
+                if (data.status === "success") {
+                    const title = document.createElement("h4");
+                    title.textContent = "실시간 버스 도착 정보";
+                    openapiContainer.appendChild(title);
+
+                    const list = document.createElement("ul");
+                    data.data.forEach(bus => {
+                        const item = document.createElement("li");
+                        item.innerHTML = `
+                            <strong>버스 번호:</strong> ${bus['버스 번호']}<br>
+                            <strong>남은 정류장 수:</strong> ${bus['남은 정류장 수']}<br>
+                            <strong>도착 예상 시간(초):</strong> ${bus['도착 예상 시간(초)']}<br>
+                            <strong>최근 정류소 명:</strong> ${bus['최근 정류소 명']}
+                        `;
+                        list.appendChild(item);
+                    });
+
+                    openapiContainer.appendChild(list);
+                } else {
+                    openapiContainer.textContent = "실시간 데이터가 없습니다.";
+                }
             })
             .catch(error => console.error('Error fetching OpenAPI data:', error));
     }
-
-    // 1초마다 fetchOpenAPIData 실행
-    setInterval(fetchOpenAPIData, 1000);
+    fetchOpenAPIData();
+    setInterval(fetchOpenAPIData, 100000);  // OpenAPI 데이터 업데이트
 </script>
 
 </html>
