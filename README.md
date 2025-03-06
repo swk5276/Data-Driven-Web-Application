@@ -6,8 +6,6 @@
 사용자 중심의 UI/UX 설계를 통해 **실시간 버스 도착 정보**, **CRUD 기능**, **검색 및 즐겨찾기 관리** 등 다양한 기능을 제공합니다.  
 웹 프레임워크와 데이터베이스를 유기적으로 연결하여 **효율적이고 직관적인 사용자 경험**을 제공합니다.
 
-![웹어플리케이션](https://swk5276-a9dzecfaa5bagzca.eastasia-01.azurewebsites.net)
-
 ![image](https://github.com/user-attachments/assets/819ac5df-328f-464e-8cb7-dc06cb055a87)
 
 ---
