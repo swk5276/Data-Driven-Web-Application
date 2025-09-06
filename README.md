@@ -1,28 +1,3 @@
-your_project/
-├─ run.py
-├─ app/
-│  ├─ __init__.py
-│  ├─ config.py
-│  ├─ routes/
-│  │  └─ main.py
-│  ├─ services/
-│  │  └─ openapi_service.py
-│  ├─ utils/
-│  │  └─ xml_utils.py
-│  └─ db.py
-├─ instance/
-│  └─ bus_data.db              # (기존 파일)
-├─ databases/
-│  └─ {버스번호}.db ...        # (기존 폴더/파일)
-└─ templates/
-   ├─ index.html
-   ├─ search.html
-   ├─ bus_info.html
-   ├─ bus_details.html
-   ├─ bus_add.html
-   └─ bus_edit.html
-
----
 
 # **Incheon University Bus Information Management System**
 ## **📌 프로젝트 개요**
